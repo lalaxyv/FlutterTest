@@ -1,0 +1,33 @@
+name: Flutter CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest # 或者 macos-latest
+
+    steps:
+    - uses: actions/checkout@v4 # 检出代码
+
+    - name: Set up Flutter SDK
+      uses: subosito/flutter-action@v2 # 使用 Flutter Action
+      with:
+        flutter-version: '3.27.1' # <-- 指定 Flutter SDK 版本
+        channel: 'stable' # 通常使用 stable 渠道
+
+    - name: Get dependencies
+      run: flutter pub get # 获取 Dart 依赖
+
+    - name: Run tests
+      run: flutter test # 运行单元测试 (可选)
+
+    - name: Build Android App (Example)
+      run: flutter build apk # 构建 Android APK (可选)
+      # 或者：
+      # run: flutter build ios --no-codesign # 构建 iOS App (可选，需要 macOS runner)
