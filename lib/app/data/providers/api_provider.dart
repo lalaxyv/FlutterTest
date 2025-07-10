@@ -1,18 +1,21 @@
 // lib/app/data/providers/api_provider.dart
 // 该文件定义了 API 服务提供者 (ApiProvider)。
 // ApiProvider 负责处理所有与后端 API 的通信，例如发送 HTTP 请求和接收响应。
-// 它使用 GetConnect (GetX 内置的 HTTP 客户端) 来执行这些操作。
+// 它现在使用 Dio 作为 HTTP 客户端。
 
 import 'package:flutter/material.dart'; // 导入 Material 包，用于颜色
-import 'package:get/get.dart'; // 导入 GetX 包
+import 'package:get/get.dart'; // 导入 GetX 包 (用于 Get.snackbar 等，非 GetConnect)
+import 'package:dio/dio.dart'; // 导入 Dio 包
 import '../models/user_model.dart'; // 导入用户模型
 import '../models/todo_model.dart'; // 导入 TODO 模型
 
 // 定义 API 的基础 URL。在实际应用中，这应该是你的后端服务器地址。
 const String _baseUrl = 'https://api.example.com'; // 模拟的基础 URL
 
-// ApiProvider 类继承自 GetConnect，获得了 HTTP 请求的能力。
-class ApiProvider extends GetConnect {
+// ApiProvider 类不再继承自 GetConnect
+class ApiProvider {
+  late Dio _dio; // Dio 实例
+
   // 用于存储模拟的 TODO 列表数据
   final List<TodoModel> _simulatedTodoList = [
     TodoModel(id: 'todo-1', task: '学习 Flutter GetX 状态管理', createdAt: DateTime.now().subtract(const Duration(days: 2)), isDone: true),
@@ -23,42 +26,53 @@ class ApiProvider extends GetConnect {
   ];
   int _nextTodoId = 6; // 用于生成新的 TODO ID
 
-  // onInit 方法在 GetConnect 实例初始化时调用。
-  // 可以在这里进行一些全局配置，例如设置基础 URL、超时时间、拦截器等。
-  @override
-  void onInit() {
-    // httpClient 是 GetConnect 提供的 HTTP 客户端实例。
-    httpClient.baseUrl = _baseUrl; // 设置所有请求的基础 URL
-    httpClient.timeout = const Duration(seconds: 10); // 设置默认超时时间为10秒
+  // ApiProvider 的构造函数，在这里初始化 Dio
+  ApiProvider() {
+    BaseOptions options = BaseOptions(
+      baseUrl: _baseUrl, // 设置基础 URL
+      connectTimeout: const Duration(seconds: 10), // 连接超时时间 (10秒)
+      receiveTimeout: const Duration(seconds: 10), // 接收超时时间 (10秒)
+      // headers: { // 可以设置全局请求头
+      //   'Content-Type': 'application/json',
+      // },
+    );
+    _dio = Dio(options); // 创建 Dio 实例
 
-    // 添加请求拦截器 (可选)
-    // 可以在每个请求发送前执行一些操作，例如添加认证 Token 到请求头。
-    httpClient.addRequestModifier<dynamic>((request) {
-      print('发起请求: ${request.method} ${request.url}'); // 打印请求信息以供调试
-      // 示例：如果本地存储了 token，可以添加到请求头
-      // final token = GetStorage().read('authToken');
-      // if (token != null) {
-      //   request.headers['Authorization'] = 'Bearer $token';
-      // }
-      return request; // 返回修改后的请求对象
-    });
-
-    // 添加响应拦截器 (可选)
-    // 可以在收到响应后执行一些操作，例如统一处理错误、解析数据等。
-    httpClient.addResponseModifier<dynamic>((request, response) {
-      print('收到响应: ${response.statusCode} for ${request.url}'); // 打印响应状态码
-      // print('响应体: ${response.bodyString}'); // 打印响应体 (调试时小心数据量过大)
-      // 示例：处理常见的 HTTP 错误状态码
-      // if (response.status.hasError) {
-      //   if (response.status.isUnauthorized) {
-      //     // 处理未授权错误，例如跳转到登录页
-      //     Get.offAllNamed(Routes.LOGIN);
-      //   }
-      //   // 可以抛出自定义异常或显示错误提示
-      //   // Get.snackbar('API 错误', response.statusText ?? '未知错误');
-      // }
-      return response; // 返回原始响应对象
-    });
+    // 添加拦截器用于日志打印 (类似于 GetConnect 的 addRequestModifier 和 addResponseModifier)
+    _dio.interceptors.add(InterceptorsWrapper(
+      onRequest: (options, handler) {
+        print('发起 Dio 请求: ${options.method} ${options.uri}'); // 打印请求信息
+        if (options.data != null) {
+          print('Dio 请求体: ${options.data}');
+        }
+        // 示例：如果本地存储了 token，可以添加到请求头
+        // final token = GetStorage().read('authToken');
+        // if (token != null) {
+        //   options.headers['Authorization'] = 'Bearer $token';
+        // }
+        return handler.next(options); // 继续请求
+      },
+      onResponse: (response, handler) {
+        print('收到 Dio 响应: ${response.statusCode} for ${response.requestOptions.uri}'); // 打印响应状态码
+        // print('Dio 响应体: ${response.data}'); // 调试时小心数据量过大
+        return handler.next(response); // 继续响应流程
+      },
+      onError: (DioException e, handler) {
+        print('Dio 请求错误: ${e.requestOptions.uri}'); // 打印错误相关的请求信息
+        print('Dio 错误类型: ${e.type}');
+        print('Dio 错误信息: ${e.message}');
+        if (e.response != null) {
+          print('Dio 错误响应码: ${e.response?.statusCode}');
+          print('Dio 错误响应体: ${e.response?.data}');
+        }
+        // 示例：处理常见的 HTTP 错误状态码
+        // if (e.response?.statusCode == 401) { // 未授权
+        //   // Get.offAllNamed(Routes.LOGIN);
+        // }
+        // Get.snackbar('API 错误', e.message ?? '未知Dio错误');
+        return handler.next(e); // 继续错误流程
+      },
+    ));
   }
 
   // --- 登录相关 API ---
@@ -70,22 +84,33 @@ class ApiProvider extends GetConnect {
     // 模拟网络延迟
     await Future.delayed(const Duration(seconds: 1));
 
-    // 模拟 API 请求和响应
-    // 在实际应用中，这里会是类似这样的代码：
-    // final response = await post(
-    //   '/auth/login', // 登录接口的路径
-    //   {'username': username, 'password': password}, // 请求体
-    // );
-    // if (response.isOk && response.body != null) {
-    //   // 假设响应体是包含用户数据和 token 的 JSON
-    //   return UserModel.fromJson(response.body as Map<String, dynamic>);
-    // } else {
-    //   // 处理错误情况，例如显示提示或返回 null
-    //   Get.snackbar('登录失败', response.body?['message'] ?? response.statusText ?? '用户名或密码错误');
+    // 实际使用 Dio 的 API 请求示例 (已注释):
+    // try {
+    //   final response = await _dio.post(
+    //     '/auth/login', // 登录接口的路径
+    //     data: {'username': username, 'password': password}, // 请求体
+    //   );
+    //   if (response.statusCode == 200 && response.data != null) {
+    //     // 假设响应体是包含用户数据和 token 的 JSON
+    //     return UserModel.fromJson(response.data as Map<String, dynamic>);
+    //   } else {
+    //     // 处理非200状态码或其他错误情况
+    //     Get.snackbar('登录失败', response.data?['message'] ?? response.statusMessage ?? '用户名或密码错误');
+    //     return null;
+    //   }
+    // } on DioException catch (e) {
+    //   // Dio 异常处理 (例如网络错误, 超时等)
+    //   print('Dio login error: $e');
+    //   Get.snackbar('登录异常', e.message ?? '网络请求失败');
+    //   return null;
+    // } catch (e) {
+    //   // 其他未知异常
+    //   print('Unknown login error: $e');
+    //   Get.snackbar('登录异常', '发生未知错误');
     //   return null;
     // }
 
-    // --- 以下为模拟逻辑 ---
+    // --- 以下为模拟逻辑 (保持不变) ---
     if (username == 'testuser' && password == 'password123') {
       // 模拟成功登录
       print('模拟登录成功: $username');
@@ -129,12 +154,24 @@ class ApiProvider extends GetConnect {
   // 模拟获取所有 TODO 事项
   Future<List<TodoModel>?> getTodos() async {
     await Future.delayed(const Duration(milliseconds: 700)); // 模拟网络延迟
-    // 在实际应用中:
-    // final response = await get('/todos');
-    // if (response.isOk && response.body != null) {
-    //   return (response.body as List).map((json) => TodoModel.fromJson(json)).toList();
+    // 实际使用 Dio 的 API 请求示例 (已注释):
+    // try {
+    //   final response = await _dio.get('/todos');
+    //   if (response.statusCode == 200 && response.data != null) {
+    //     return (response.data as List).map((json) => TodoModel.fromJson(json as Map<String, dynamic>)).toList();
+    //   }
+    //   return null;
+    // } on DioException catch (e) {
+    //   print('Dio getTodos error: $e');
+    //   Get.snackbar('获取TODO异常', e.message ?? '网络请求失败');
+    //   return null;
+    // } catch (e) {
+    //   print('Unknown getTodos error: $e');
+    //   Get.snackbar('获取TODO异常', '发生未知错误');
+    //   return null;
     // }
-    // return null;
+
+    // --- 以下为模拟逻辑 (保持不变) ---
     print('API 模拟: 获取了 ${_simulatedTodoList.length} 条 TODO 事项。');
     return List<TodoModel>.from(_simulatedTodoList); // 返回模拟列表的副本
   }
@@ -142,6 +179,7 @@ class ApiProvider extends GetConnect {
   // 模拟添加新的 TODO 事项
   Future<TodoModel?> addTodo(String taskContent) async {
     await Future.delayed(const Duration(milliseconds: 500)); // 模拟网络延迟
+    // --- 以下为模拟逻辑 (部分修改以演示前置检查) ---
     if (taskContent.isEmpty) {
       Get.snackbar('错误', '任务内容不能为空', snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.orange);
       return null;
@@ -152,12 +190,25 @@ class ApiProvider extends GetConnect {
       createdAt: DateTime.now(),
       updatedAt: DateTime.now(),
     );
-    // 在实际应用中:
-    // final response = await post('/todos', newTodo.toJson());
-    // if (response.isOk && response.body != null) {
-    //   return TodoModel.fromJson(response.body);
+
+    // 实际使用 Dio 的 API 请求示例 (已注释):
+    // try {
+    //   final response = await _dio.post('/todos', data: newTodo.toJson());
+    //   if (response.statusCode == 201 && response.data != null) { // 通常创建成功是 201
+    //     return TodoModel.fromJson(response.data as Map<String, dynamic>);
+    //   }
+    //   return null;
+    // } on DioException catch (e) {
+    //   print('Dio addTodo error: $e');
+    //   Get.snackbar('添加TODO异常', e.message ?? '网络请求失败');
+    //   return null;
+    // } catch (e) {
+    //   print('Unknown addTodo error: $e');
+    //   Get.snackbar('添加TODO异常', '发生未知错误');
+    //   return null;
     // }
-    // return null;
+
+    // --- 以下为模拟逻辑 (核心部分保持不变) ---
     _simulatedTodoList.add(newTodo);
     print('API 模拟: 添加了新的 TODO: ${newTodo.task}');
     return newTodo;
@@ -166,15 +217,27 @@ class ApiProvider extends GetConnect {
   // 模拟更新 TODO 事项 (例如切换完成状态)
   Future<TodoModel?> updateTodo(TodoModel todoToUpdate) async {
     await Future.delayed(const Duration(milliseconds: 300)); // 模拟网络延迟
+    // 实际使用 Dio 的 API 请求示例 (已注释):
+    // try {
+    //   final response = await _dio.put('/todos/${todoToUpdate.id}', data: todoToUpdate.toJson());
+    //   if (response.statusCode == 200 && response.data != null) {
+    //     return TodoModel.fromJson(response.data as Map<String, dynamic>);
+    //   }
+    //   return null;
+    // } on DioException catch (e) {
+    //   print('Dio updateTodo error: $e');
+    //   Get.snackbar('更新TODO异常', e.message ?? '网络请求失败');
+    //   return null;
+    // } catch (e) {
+    //   print('Unknown updateTodo error: $e');
+    //   Get.snackbar('更新TODO异常', '发生未知错误');
+    //   return null;
+    // }
+
+    // --- 以下为模拟逻辑 (核心部分保持不变) ---
     final index = _simulatedTodoList.indexWhere((todo) => todo.id == todoToUpdate.id);
     if (index != -1) {
       _simulatedTodoList[index] = todoToUpdate.copyWith(updatedAt: DateTime.now());
-      // 在实际应用中:
-      // final response = await put('/todos/${todoToUpdate.id}', todoToUpdate.toJson());
-      // if (response.isOk && response.body != null) {
-      //   return TodoModel.fromJson(response.body);
-      // }
-      // return null;
       print('API 模拟: 更新了 TODO: ${todoToUpdate.task}, isDone: ${todoToUpdate.isDone}');
       return _simulatedTodoList[index];
     }
@@ -185,11 +248,23 @@ class ApiProvider extends GetConnect {
   // 模拟删除 TODO 事项
   Future<bool> deleteTodo(String todoId) async {
     await Future.delayed(const Duration(milliseconds: 400)); // 模拟网络延迟
+    // 实际使用 Dio 的 API 请求示例 (已注释):
+    // try {
+    //   final response = await _dio.delete('/todos/$todoId');
+    //   return response.statusCode == 200 || response.statusCode == 204; // 删除成功通常是 200 或 204
+    // } on DioException catch (e) {
+    //   print('Dio deleteTodo error: $e');
+    //   Get.snackbar('删除TODO异常', e.message ?? '网络请求失败');
+    //   return false;
+    // } catch (e) {
+    //   print('Unknown deleteTodo error: $e');
+    //   Get.snackbar('删除TODO异常', '发生未知错误');
+    //   return false;
+    // }
+
+    // --- 以下为模拟逻辑 (核心部分保持不变) ---
     final initialLength = _simulatedTodoList.length;
     _simulatedTodoList.removeWhere((todo) => todo.id == todoId);
-    // 在实际应用中:
-    // final response = await delete('/todos/$todoId');
-    // return response.isOk;
     if (_simulatedTodoList.length < initialLength) {
       print('API 模拟: 删除了 TODO ID: $todoId');
       return true;
@@ -208,14 +283,26 @@ class ApiProvider extends GetConnect {
   Future<UserModel?> getUserProfile(String userIdOrToken) async {
     await Future.delayed(const Duration(milliseconds: 600)); // 模拟网络延迟
 
-    // 在实际应用中，你可能会从本地存储获取当前用户ID或token，然后请求特定用户的信息
-    // final response = await get('/users/profile'); // 或者 /users/{userId}
-    // if (response.isOk && response.body != null) {
-    //   return UserModel.fromJson(response.body);
+    // 实际使用 Dio 的 API 请求示例 (已注释):
+    // try {
+    //   // 假设 token 已通过拦截器添加到 header，或者在这里直接添加
+    //   // final response = await _dio.get('/users/profile'); // 如果是获取当前登录用户的profile
+    //   final response = await _dio.get('/users/$userIdOrToken'); // 如果是根据ID获取特定用户
+    //   if (response.statusCode == 200 && response.data != null) {
+    //     return UserModel.fromJson(response.data as Map<String, dynamic>);
+    //   }
+    //   return null;
+    // } on DioException catch (e) {
+    //   print('Dio getUserProfile error: $e');
+    //   Get.snackbar('获取用户信息异常', e.message ?? '网络请求失败');
+    //   return null;
+    // } catch (e) {
+    //   print('Unknown getUserProfile error: $e');
+    //   Get.snackbar('获取用户信息异常', '发生未知错误');
+    //   return null;
     // }
-    // return null;
 
-    // --- 模拟逻辑 ---
+    // --- 模拟逻辑 (保持不变) ---
     // 假设我们根据之前登录时生成的 token 或 id 来返回用户信息
     // 为了简单，我们只返回一个固定的模拟用户数据，或者可以基于登录时的用户数据
     // 这里我们用一个固定的 testuser 的信息作为示例，因为 Profile 模块的 Controller
@@ -258,15 +345,25 @@ class ApiProvider extends GetConnect {
   Future<UserModel?> updateUserProfile(UserModel userToUpdate) async {
     await Future.delayed(const Duration(milliseconds: 800)); // 模拟网络延迟
 
-    // 在实际应用中:
-    // final response = await put('/users/profile', userToUpdate.toJson()); // 或者 /users/{userId}
-    // if (response.isOk && response.body != null) {
-    //   // API 应该返回更新后的用户信息
-    //   return UserModel.fromJson(response.body);
+    // 实际使用 Dio 的 API 请求示例 (已注释):
+    // try {
+    //   // final response = await _dio.put('/users/profile', data: userToUpdate.toJson()); // 更新当前登录用户
+    //   final response = await _dio.put('/users/${userToUpdate.id}', data: userToUpdate.toJson()); // 根据ID更新特定用户
+    //   if (response.statusCode == 200 && response.data != null) {
+    //     return UserModel.fromJson(response.data as Map<String, dynamic>);
+    //   }
+    //   return null;
+    // } on DioException catch (e) {
+    //   print('Dio updateUserProfile error: $e');
+    //   Get.snackbar('更新用户信息异常', e.message ?? '网络请求失败');
+    //   return null;
+    // } catch (e) {
+    //   print('Unknown updateUserProfile error: $e');
+    //   Get.snackbar('更新用户信息异常', '发生未知错误');
+    //   return null;
     // }
-    // return null; // 或抛出异常
 
-    // --- 模拟逻辑 ---
+    // --- 模拟逻辑 (核心部分保持不变) ---
     // 在这个模拟中，我们只是打印信息并直接返回传入的用户数据，假装更新成功
     // 实际应用中，服务器会验证数据、持久化存储，并可能返回包含更新时间戳等信息的对象
     print('API 模拟: 尝试更新用户信息 ID: ${userToUpdate.id}');
