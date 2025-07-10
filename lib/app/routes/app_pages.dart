@@ -32,12 +32,12 @@ class AppPages {
   // 每个 GetPage 对象代表一个路由配置
   static final routes = [
     GetPage(
-      name: _Paths.LOGIN, // 路由名称，来自 app_routes.dart 中的 _Paths
+      name: Routes.LOGIN, // 路由名称，来自 app_routes.dart 中的 _Paths
       page: () => LoginView(), // 该路由对应的视图组件
       binding: LoginBinding(), // 该路由对应的绑定类，用于依赖注入控制器
     ),
     GetPage(
-      name: _Paths.HOME, // 主页路由
+      name: Routes.HOME, // 主页路由
       page: () => HomeView(), // 主页视图
       binding: HomeBinding(), // 主页绑定
       // 如果 TODO 和 Profile 是 Home 的子页面/标签页，

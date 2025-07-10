@@ -38,9 +38,9 @@ class ProfileView extends GetView<ProfileController> {
               ),
               const SizedBox(height: 10),
               ElevatedButton.icon(
-                  icon: const Icon(Icons.refresh_rounded),
-                  label: const Text('重试'),
-                  onPressed: controller.fetchUserProfile,
+                icon: const Icon(Icons.refresh_rounded),
+                label: const Text('重试'),
+                onPressed: controller.fetchUserProfile,
               )
             ],
           ),
@@ -57,7 +57,7 @@ class ProfileView extends GetView<ProfileController> {
           child: controller.isEditing.value
               ? _buildEditForm(context) // 如果是编辑模式，构建编辑表单
               : _buildProfileInfo(context, controller.currentUser.value!), // 如果是查看模式，构建信息展示区
-                                                                        // ! 安全，因为前面已检查 currentUser.value != null
+          // ! 安全，因为前面已检查 currentUser.value != null
         ),
       );
     });
@@ -66,11 +66,13 @@ class ProfileView extends GetView<ProfileController> {
   // 构建用户信息展示部分的 Widget
   // 参数 userModel 确保我们总是使用最新的用户信息来构建 UI
   Widget _buildProfileInfo(BuildContext context, UserModel userModel) {
-    return Column( // 垂直布局
+    return Column(
+      // 垂直布局
       crossAxisAlignment: CrossAxisAlignment.center, // 子组件整体居中
       children: <Widget>[
         // 用户头像 (示例)
-        CircleAvatar( // 圆形头像
+        CircleAvatar(
+          // 圆形头像
           radius: 60, // 半径
           backgroundColor: Colors.grey[300], // 背景色
           // backgroundImage: userModel.avatarUrl != null ? NetworkImage(userModel.avatarUrl!) : null, // 假设 UserModel 有 avatarUrl
@@ -84,11 +86,11 @@ class ProfileView extends GetView<ProfileController> {
         const SizedBox(height: 24), // 添加垂直间距
 
         // 用户名展示
-        _buildInfoCard(Icons.person_pin_rounded, "用户名", userModel.username),
+        _buildInfoCard(context, Icons.person_pin_rounded, "用户名", userModel.username),
         // 邮箱展示
-        _buildInfoCard(Icons.alternate_email_rounded, "邮箱", userModel.email),
+        _buildInfoCard(context, Icons.alternate_email_rounded, "邮箱", userModel.email),
         // 简介展示
-        _buildInfoCard(Icons.text_snippet_rounded, "简介", userModel.bio ?? "暂无简介", maxLines: null), // maxLines null 允许自动换行
+        _buildInfoCard(context, Icons.text_snippet_rounded, "简介", userModel.bio ?? "暂无简介", maxLines: null), // maxLines null 允许自动换行
         const SizedBox(height: 32), // 添加垂直间距
 
         // 编辑按钮和加载指示器
@@ -99,9 +101,8 @@ class ProfileView extends GetView<ProfileController> {
                 label: const Text('编辑信息'), // 按钮文本
                 onPressed: controller.toggleEditMode, // 点击时调用控制器方法切换到编辑模式
                 style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 35, vertical: 12), // 按钮内边距
-                  textStyle: const TextStyle(fontSize: 16)
-                ),
+                    padding: const EdgeInsets.symmetric(horizontal: 35, vertical: 12), // 按钮内边距
+                    textStyle: const TextStyle(fontSize: 16)),
               )),
         const SizedBox(height: 16), // 间隔
 
@@ -123,9 +124,11 @@ class ProfileView extends GetView<ProfileController> {
   Widget _buildEditForm(BuildContext context) {
     final formKey = GlobalKey<FormState>(); // 创建一个 GlobalKey 用于表单验证
 
-    return Form( // 使用 Form Widget 来管理表单状态和验证
+    return Form(
+      // 使用 Form Widget 来管理表单状态和验证
       key: formKey, //关联 GlobalKey
-      child: Column( // 垂直布局
+      child: Column(
+        // 垂直布局
         crossAxisAlignment: CrossAxisAlignment.stretch, // 子组件水平拉伸填充
         children: <Widget>[
           Text("编辑个人信息", style: Theme.of(context).textTheme.headlineSmall, textAlign: TextAlign.center),
@@ -143,7 +146,8 @@ class ProfileView extends GetView<ProfileController> {
             controller: controller.emailEditingController, // 关联文本控制器
             decoration: const InputDecoration(labelText: '邮箱', border: OutlineInputBorder(), prefixIcon: Icon(Icons.email_outlined)),
             keyboardType: TextInputType.emailAddress, // 设置键盘类型为邮箱地址
-            validator: (value) { // 邮箱格式简单验证
+            validator: (value) {
+              // 邮箱格式简单验证
               if (value == null || value.isEmpty) return '邮箱不能为空';
               if (!GetUtils.isEmail(value)) return '请输入有效的邮箱地址';
               return null;
@@ -166,7 +170,8 @@ class ProfileView extends GetView<ProfileController> {
             if (controller.isLoading.value && controller.isEditing.value) {
               return const Center(child: CircularProgressIndicator());
             }
-            return Row( // 水平布局
+            return Row(
+              // 水平布局
               mainAxisAlignment: MainAxisAlignment.spaceEvenly, // 子组件均匀分布空间
               children: <Widget>[
                 // 取消按钮
@@ -197,14 +202,15 @@ class ProfileView extends GetView<ProfileController> {
   }
 
   // 辅助方法：构建信息展示卡片（图标 + 标签 + 值）
-  Widget _buildInfoCard(IconData icon, String label, String value, {int? maxLines = 1}) {
+  Widget _buildInfoCard(BuildContext context, IconData icon, String label, String value, {int? maxLines = 1}) {
     return Card(
       elevation: 1.0,
       margin: const EdgeInsets.symmetric(vertical: 8.0),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
       child: Padding(
         padding: const EdgeInsets.all(16.0), // 上下边距
-        child: Row( // 水平布局
+        child: Row(
+          // 水平布局
           crossAxisAlignment: maxLines == null ? CrossAxisAlignment.start : CrossAxisAlignment.center, // 顶部对齐，以防多行文本不对齐
           children: [
             Icon(icon, color: Theme.of(context).primaryColor, size: 24), // 左侧图标
@@ -213,7 +219,8 @@ class ProfileView extends GetView<ProfileController> {
               '$label: ', // 标签文本
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.grey[700]),
             ),
-            Expanded( // Expanded 使值文本占据剩余空间，并能自动换行
+            Expanded(
+              // Expanded 使值文本占据剩余空间，并能自动换行
               child: Text(
                 value.isEmpty && label == "简介" ? "这家伙很神秘，什么都没留下..." : value, // 如果简介为空，显示提示
                 style: TextStyle(fontSize: 16, color: Colors.grey[850]),
