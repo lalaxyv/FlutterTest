@@ -35,15 +35,17 @@ class HomeView extends GetView<HomeController> {
           }
         }),
         centerTitle: true, // 标题居中
-        // actions: [ // 可以在 AppBar 右侧添加操作按钮
-        //   IconButton(
-        //     icon: Icon(Icons.logout),
-        //     onPressed: () {
-        //       // TODO: 实现退出登录逻辑
-        //       // Get.offAllNamed(Routes.LOGIN);
-        //     },
-        //   ),
-        // ],
+        actions: [ // 可以在 AppBar 右侧添加操作按钮
+          // 临时添加一个按钮用于跳转到播放器页面
+          IconButton(
+            icon: const Icon(Icons.music_note_rounded),
+            tooltip: '打开播放器',
+            onPressed: () {
+              // 使用 Get.toNamed 导航到播放器页面
+              Get.toNamed('/player'); // 直接使用路径字符串
+            },
+          ),
+        ],
       ),
       // body 部分根据当前选中的标签页动态显示不同的视图
       // 使用 Obx 包裹以响应 controller.tabIndex 的变化
