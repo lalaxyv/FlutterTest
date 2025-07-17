@@ -26,8 +26,6 @@ class PlayerController extends GetxController {
   var totalDuration = Duration.zero.obs;
   // 音量大小 (0.0 到 1.0)
   var volume = 1.0.obs;
-  // 播放列表是否可见
-  var isPlaylistVisible = false.obs;
   // 播放模式
   var playMode = PlayMode.loop.obs;
 
@@ -152,11 +150,6 @@ class PlayerController extends GetxController {
   void changeVolume(double newVolume) {
     volume.value = newVolume;
     _audioPlayer.setVolume(newVolume);
-  }
-
-  // 切换播放列表的可见性
-  void togglePlaylistVisibility() {
-      isPlaylistVisible.value = !isPlaylistVisible.value;
   }
 
   // 切换播放模式
