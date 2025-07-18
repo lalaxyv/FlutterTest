@@ -36,7 +36,81 @@ class ApiProvider {
         duration: const Duration(minutes: 3, seconds: 45),
         albumArtUrl:
             'https://links.jianshu.com/go?to=https%3A%2F%2Fupload-images.jianshu.io%2Fupload_images%2F5809200-a99419bb94924e6d.jpg%3FimageMogr2%2Fauto-orient%2Fstrip%257CimageView2%2F2%2Fw%2F1240',
-        audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3'),
+        audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
+        lyrics: """
+            [ti:夜曲]
+            [ar:周杰伦]
+            [al:十一月的萧邦]
+            [offset:0]
+            [by:谢鑫 ]
+            [00:00.00]歌曲：夜曲
+            [00:04.51]歌手：周杰伦
+            [00:07.65]专辑：十一月的萧邦
+            [00:21.06]一群嗜血的蚂蚁被腐肉所吸引
+            [00:25.18]我面无表情看孤独的风景
+            [00:27.87]失去你爱开始分明
+            [00:30.68]失去你还有什么事好关心
+            [00:33.43]当鸽子不再象征和平
+            [00:35.43]我终於被提醒
+            [00:36.80]广场上餵食的是秃鹰
+            [00:38.62]我用漂亮的押韵
+            [00:40.37]形容被掠夺一空的爱情
+            [00:43.81]啊乌云开始遮蔽夜色不乾净
+            [00:46.99]公园里葬礼的回音在漫天飞行
+            [00:49.62]送你的白色玫瑰
+            [00:51.24]在纯黑的环境凋零
+            [00:52.81]乌鸦在树枝上诡异的很安静
+            [00:55.12]静静听我黑色的大衣
+            [00:57.50]想温暖你日渐冰冷的回忆
+            [00:59.87]走过的走过的生命
+            [01:00.99]啊四周弥漫雾气
+            [01:02.50]我在空旷的墓地
+            [01:03.88]老去后还爱你
+            [01:05.56]为你弹奏萧邦的夜曲
+            [01:09.12]纪念我死去的爱情
+            [01:11.74]跟夜风一样的声音
+            [01:14.75]心碎的很好听
+            [01:17.31]手在键盘敲很轻
+            [01:20.06]我给的思念很小心
+            [01:22.87]你埋葬的地方叫幽冥
+            [01:27.69]为你弹奏萧邦的夜曲
+            [01:31.12]纪念我死去的爱情
+            [01:33.80]而我为你隐姓埋名
+            [01:36.87]在月光下弹琴
+            [01:39.43]对你心跳的感应
+            [01:42.19]还是如此温热亲近
+            [01:44.94]怀念你那鲜红的唇印
+            [02:06.51]那些断翅的蜻蜓散落在这森林
+            [02:15.51]而我的眼睛没有丝毫同情
+            [02:18.31]失去你泪水混浊不清
+            [02:20.94]失去你我连笑容都有阴影
+            [02:23.69]风在长满青苔的屋顶
+            [02:25.81]嘲笑我的伤心
+            [02:27.13]像一口没有水的枯井
+            [02:29.32]我用凄美的字型
+            [02:30.81]描绘后悔莫及的那爱情
+            [02:33.87]为你弹奏萧邦的夜曲
+            [02:37.30]纪念我死去的爱情
+            [02:40.13]跟夜风一样的声音
+            [02:43.00]心碎的很好听
+            [02:45.75]手在键盘敲很轻
+            [02:48.38]我给的思念很小心
+            [02:51.12]你埋葬的地方叫幽冥
+            [02:55.88]为你弹奏萧邦的夜曲
+            [02:59.44]纪念我死去的爱情
+            [03:02.13]而我为你隐姓埋名在月光下弹琴
+            [03:07.75]对你心跳的感应还是如此温热亲近
+            [03:13.19]怀念你那鲜红的唇印
+            [03:18.12]一群嗜血的蚂蚁被腐肉所吸引
+            [03:21.69]我面无表情看孤独的风景
+            [03:24.44]失去你爱开始分明
+            [03:27.18]失去你还有什么事好关心
+            [03:30.06]当鸽子不再象征和平
+            [03:32.00]我终於被提醒
+            [03:33.31]广场上餵食的是秃鹰
+            [03:35.32]我用漂亮的押韵
+            [03:37.00]形容被掠夺一空的爱情
+            """),
     SongModel(
         id: '2',
         title: '稻香',
@@ -44,7 +118,16 @@ class ApiProvider {
         duration: const Duration(minutes: 3, seconds: 21),
         albumArtUrl:
             'https://links.jianshu.com/go?to=https%3A%2F%2Fupload-images.jianshu.io%2Fupload_images%2F5809200-48dd99da471ffa3f.jpg%3FimageMogr2%2Fauto-orient%2Fstrip%257CimageView2%2F2%2Fw%2F1240',
-        audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3'),
+        audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3',
+        lyrics: """
+          [00:20.10]对这个世界如果你有太多的抱怨
+          [00:24.50]跌倒了就不敢继续往前走
+          [00:28.00]为什么人要这么的脆弱 堕落
+          [00:35.50]请你打开电视看看
+          [00:39.00]多少人为生命在努力勇敢的走下去
+          [00:43.00]我们是不是该知足
+          [00:46.50]珍惜一切 就算没有拥有
+          """),
     SongModel(
         id: '3',
         title: '青花瓷',
@@ -52,7 +135,17 @@ class ApiProvider {
         duration: const Duration(minutes: 3, seconds: 58),
         albumArtUrl:
             'https://links.jianshu.com/go?to=https%3A%2F%2Fupload-images.jianshu.io%2Fupload_images%2F5809200-03bbbd715c24750e.jpg%3FimageMogr2%2Fauto-orient%2Fstrip%257CimageView2%2F2%2Fw%2F1240',
-        audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3'),
+        audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3',
+        lyrics: """
+          [00:10.00]素胚勾勒出青花笔锋浓转淡
+          [00:17.50]瓶身描绘的牡丹一如你初妆
+          [00:25.00]冉冉檀香透过窗心事我了然
+          [00:32.50]宣纸上走笔至此搁一半
+          [00:40.00]釉色渲染仕女图韵味被私藏
+          [00:47.50]而你嫣然的一笑如含苞待放
+          [00:55.00]你的美一缕飘散
+          [01:00.00]去到我去不了的地方
+          """),
   ];
 
   // ApiProvider 的构造函数，在这里初始化 Dio

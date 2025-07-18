@@ -9,6 +9,7 @@ class SongModel {
   final String albumArtUrl; // 专辑封面图片的URL
   final String audioUrl; // 歌曲音频文件的URL
   final Duration duration; // 歌曲的总时长
+  final String? lyrics; // 歌词字符串，通常是 LRC 格式
 
   // SongModel 的构造函数
   SongModel({
@@ -18,6 +19,7 @@ class SongModel {
     required this.albumArtUrl,
     required this.audioUrl,
     required this.duration,
+    this.lyrics, // 歌词是可选的
   });
 
   // (可选) 工厂构造函数：从 JSON 对象创建 SongModel 实例
@@ -29,8 +31,8 @@ class SongModel {
       artist: json['artist'] as String,
       albumArtUrl: json['albumArtUrl'] as String,
       audioUrl: json['audioUrl'] as String,
-      // 从一个整数（例如，秒数）创建 Duration
       duration: Duration(seconds: json['durationInSeconds'] as int? ?? 0),
+      lyrics: json['lyrics'] as String?,
     );
   }
 
@@ -43,12 +45,12 @@ class SongModel {
       'albumArtUrl': albumArtUrl,
       'audioUrl': audioUrl,
       'durationInSeconds': duration.inSeconds,
+      'lyrics': lyrics,
     };
   }
 
   // (可选) 格式化时长为 "mm:ss" 格式的字符串，方便UI显示
   String get formattedDuration {
-    // 将总秒数分解为分钟和秒
     final minutes = duration.inMinutes.remainder(60).toString().padLeft(2, '0');
     final seconds = duration.inSeconds.remainder(60).toString().padLeft(2, '0');
     return '$minutes:$seconds';

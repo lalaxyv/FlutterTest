@@ -31,11 +31,14 @@ class PlayerView extends GetView<PlayerController> {
               child: Column(
                 children: [
                   _buildPlayerHeader(),
-                  const Spacer(flex: 2),
+                  const SizedBox(height: 20),
                   _buildAlbumArt(),
-                  const SizedBox(height: 40),
+                  const SizedBox(height: 30),
                   _buildSongInfo(),
-                  const Spacer(flex: 3),
+                  const SizedBox(height: 20),
+                  // 歌词视图
+                  _buildLyricsView(),
+                  const Spacer(),
                 ],
               ),
             ),
@@ -129,8 +132,8 @@ class PlayerView extends GetView<PlayerController> {
       // turns 属性绑定到动画控制器
       turns: controller.albumArtAnimationController,
       child: Container(
-        width: 250,
-        height: 250,
+        width: 220, // 缩小封面尺寸为歌词留出空间
+        height: 220,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           boxShadow: [
@@ -165,7 +168,7 @@ class PlayerView extends GetView<PlayerController> {
                     child: Center(
                       child: Text(
                         '♪',
-                        style: TextStyle(fontSize: 150, color: Colors.white.withOpacity(0.6)),
+                        style: TextStyle(fontSize: 100, color: Colors.white.withOpacity(0.6)),
                       ),
                     ),
                   );
@@ -183,16 +186,65 @@ class PlayerView extends GetView<PlayerController> {
             Text(
               controller.currentSong.value?.title ?? '未知歌曲',
               textAlign: TextAlign.center,
-              style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+              style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             Text(
               controller.currentSong.value?.artist ?? '未知艺术家',
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 16),
+              style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 15),
             ),
           ],
         ));
+  }
+
+  // 构建歌词视图
+  Widget _buildLyricsView() {
+    // 创建一个 ScrollController 用于控制歌词滚动
+    final ScrollController scrollController = ScrollController();
+
+    // 监听当前歌词行索引的变化，并滚动列表
+    ever(controller.currentLyricIndex, (index) {
+      if (index >= 0 && scrollController.hasClients) {
+        final itemHeight = 50.0; // 假设每行歌词的高度约为50
+        final position = index * itemHeight - (Get.height * 0.1); // 滚动到屏幕偏上的位置
+        scrollController.animateTo(
+          position,
+          duration: const Duration(milliseconds: 500),
+          curve: Curves.easeInOut,
+        );
+      }
+    });
+
+    return Expanded(
+      child: Obx(() {
+        if (controller.lyrics.isEmpty) {
+          return Center(
+            child: Text('暂无歌词', style: TextStyle(color: Colors.white.withOpacity(0.5))),
+          );
+        }
+        return ListView.builder(
+          controller: scrollController,
+          itemCount: controller.lyrics.length,
+          itemBuilder: (context, index) {
+            final line = controller.lyrics[index];
+            final bool isCurrentLine = index == controller.currentLyricIndex.value;
+            return Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              child: Text(
+                line.text,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: isCurrentLine ? Colors.red : Colors.white.withOpacity(0.5),
+                  fontSize: isCurrentLine ? 18 : 16,
+                  fontWeight: isCurrentLine ? FontWeight.bold : FontWeight.normal,
+                ),
+              ),
+            );
+          },
+        );
+      }),
+    );
   }
 
   // 构建底部的整个控制面板
@@ -201,7 +253,7 @@ class PlayerView extends GetView<PlayerController> {
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 15.0, sigmaY: 15.0),
         child: Container(
-          padding: const EdgeInsets.fromLTRB(20, 20, 20, 30), // 底部留出更多安全距离
+          padding: const EdgeInsets.fromLTRB(20, 15, 20, 25), // 底部留出更多安全距离
           decoration: BoxDecoration(
             color: Colors.white.withOpacity(0.1),
             border: Border(top: BorderSide(color: Colors.white.withOpacity(0.2), width: 1.0)),
@@ -210,9 +262,9 @@ class PlayerView extends GetView<PlayerController> {
             mainAxisSize: MainAxisSize.min,
             children: [
               _buildProgressBar(),
-              const SizedBox(height: 15),
+              const SizedBox(height: 10),
               _buildControls(),
-              const SizedBox(height: 15),
+              const SizedBox(height: 10),
               _buildExtraControls(),
             ],
           ),
@@ -273,12 +325,12 @@ class PlayerView extends GetView<PlayerController> {
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
         IconButton(
-          icon: const Icon(Icons.skip_previous_rounded, color: Colors.white, size: 35),
+          icon: const Icon(Icons.skip_previous_rounded, color: Colors.white, size: 32),
           onPressed: controller.previousSong,
         ),
         Obx(() => Container(
-              width: 70,
-              height: 70,
+              width: 60,
+              height: 60,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: Colors.white.withOpacity(0.9),
@@ -287,13 +339,13 @@ class PlayerView extends GetView<PlayerController> {
                 icon: Icon(
                   controller.isPlaying.value ? Icons.pause_rounded : Icons.play_arrow_rounded,
                   color: const Color(0xFF6A61A2),
-                  size: 45,
+                  size: 40,
                 ),
                 onPressed: controller.playPause,
               ),
             )),
         IconButton(
-          icon: const Icon(Icons.skip_next_rounded, color: Colors.white, size: 35),
+          icon: const Icon(Icons.skip_next_rounded, color: Colors.white, size: 32),
           onPressed: controller.nextSong,
         ),
       ],
@@ -306,7 +358,7 @@ class PlayerView extends GetView<PlayerController> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         IconButton(
-          icon: const Icon(Icons.favorite_border_rounded, color: Colors.white70),
+          icon: const Icon(Icons.favorite_border_rounded, color: Colors.white70, size: 22),
           onPressed: () {},
         ),
         Obx(() {
@@ -323,12 +375,12 @@ class PlayerView extends GetView<PlayerController> {
               break;
           }
           return IconButton(
-            icon: Icon(modeIcon, color: Colors.white),
+            icon: Icon(modeIcon, color: Colors.white, size: 22),
             onPressed: controller.togglePlayMode,
           );
         }),
         IconButton(
-          icon: const Icon(Icons.queue_music_rounded, color: Colors.white70),
+          icon: const Icon(Icons.queue_music_rounded, color: Colors.white70, size: 22),
           onPressed: () {
             Get.bottomSheet(
               _buildPlaylistSheet(),
