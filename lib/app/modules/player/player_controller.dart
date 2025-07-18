@@ -7,12 +7,16 @@ import 'package:flutter/animation.dart';
 import 'package:get/get.dart'; // 导入 GetX 包
 import 'package:just_audio/just_audio.dart'; // 导入 just_audio 包
 import '../../data/models/song_model.dart'; // 导入歌曲模型
+import '../../data/providers/api_provider.dart'; // 导入 API Provider
 
 // 定义播放模式的枚举
 enum PlayMode { single, loop, shuffle }
 
 // PlayerController 类继承自 GetxController，并混入 GetSingleTickerProviderStateMixin 以提供 Ticker
 class PlayerController extends GetxController with GetSingleTickerProviderStateMixin {
+  // --- 依赖注入 ---
+  final ApiProvider _apiProvider = Get.find<ApiProvider>();
+
   // --- 响应式状态变量 ---
 
   // 播放器是否正在播放
@@ -47,7 +51,7 @@ class PlayerController extends GetxController with GetSingleTickerProviderStateM
       duration: const Duration(seconds: 20), // 旋转一周的时间
     );
 
-    _loadMockPlaylist(); // 加载模拟播放列表
+    _loadPlaylist(); // 从 ApiProvider 加载播放列表
     _listenToPlayerState(); // 监听播放器状态变化
     _listenToAnimation(); // 监听播放状态以控制动画
   }
@@ -62,15 +66,13 @@ class PlayerController extends GetxController with GetSingleTickerProviderStateM
 
   // --- 逻辑方法 ---
 
-  // 加载模拟的播放列表数据
-  void _loadMockPlaylist() {
-    playlist.assignAll([
-      SongModel(id: '1', title: '夜曲', artist: '周杰伦', duration: const Duration(minutes: 3, seconds: 45), albumArtUrl: 'https://picsum.photos/seed/1/400', audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3'),
-      SongModel(id: '2', title: '稻香', artist: '周杰伦', duration: const Duration(minutes: 3, seconds: 21), albumArtUrl: 'https://picsum.photos/seed/2/400', audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3'),
-      SongModel(id: '3', title: '青花瓷', artist: '周杰伦', duration: const Duration(minutes: 3, seconds: 58), albumArtUrl: 'https://picsum.photos/seed/3/400', audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3'),
-    ]);
-    if (playlist.isNotEmpty) {
-      selectSong(playlist.first, autoPlay: false); // 默认加载第一首歌，但不自动播放
+  // 从 ApiProvider 加载播放列表数据
+  Future<void> _loadPlaylist() async {
+    final List<SongModel>? fetchedPlaylist = await _apiProvider.getPlaylist();
+    if (fetchedPlaylist != null && fetchedPlaylist.isNotEmpty) {
+      playlist.assignAll(fetchedPlaylist);
+      // 默认加载第一首歌，但不自动播放
+      selectSong(playlist.first, autoPlay: false);
     }
   }
 
