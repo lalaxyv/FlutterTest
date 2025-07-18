@@ -8,6 +8,7 @@ import 'package:get/get.dart'; // 导入 GetX 包 (用于 Get.snackbar 等，非
 import 'package:dio/dio.dart'; // 导入 Dio 包
 import '../models/user_model.dart'; // 导入用户模型
 import '../models/todo_model.dart'; // 导入 TODO 模型
+import '../models/song_model.dart'; // 导入歌曲模型
 
 // 定义 API 的基础 URL。在实际应用中，这应该是你的后端服务器地址。
 const String _baseUrl = 'https://api.example.com'; // 模拟的基础 URL
@@ -25,6 +26,34 @@ class ApiProvider {
     TodoModel(id: 'todo-5', task: '测试应用功能', createdAt: DateTime.now().add(const Duration(hours: 2)), isDone: false),
   ];
   int _nextTodoId = 6; // 用于生成新的 TODO ID
+
+  // 用于存储模拟的播放列表数据 (从 PlayerController 移入)
+  final List<SongModel> _simulatedPlaylist = [
+    SongModel(
+        id: '1',
+        title: '夜曲',
+        artist: '周杰伦',
+        duration: const Duration(minutes: 3, seconds: 45),
+        albumArtUrl:
+            'https://links.jianshu.com/go?to=https%3A%2F%2Fupload-images.jianshu.io%2Fupload_images%2F5809200-a99419bb94924e6d.jpg%3FimageMogr2%2Fauto-orient%2Fstrip%257CimageView2%2F2%2Fw%2F1240',
+        audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3'),
+    SongModel(
+        id: '2',
+        title: '稻香',
+        artist: '周杰伦',
+        duration: const Duration(minutes: 3, seconds: 21),
+        albumArtUrl:
+            'https://links.jianshu.com/go?to=https%3A%2F%2Fupload-images.jianshu.io%2Fupload_images%2F5809200-48dd99da471ffa3f.jpg%3FimageMogr2%2Fauto-orient%2Fstrip%257CimageView2%2F2%2Fw%2F1240',
+        audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3'),
+    SongModel(
+        id: '3',
+        title: '青花瓷',
+        artist: '周杰伦',
+        duration: const Duration(minutes: 3, seconds: 58),
+        albumArtUrl:
+            'https://links.jianshu.com/go?to=https%3A%2F%2Fupload-images.jianshu.io%2Fupload_images%2F5809200-03bbbd715c24750e.jpg%3FimageMogr2%2Fauto-orient%2Fstrip%257CimageView2%2F2%2Fw%2F1240',
+        audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3'),
+  ];
 
   // ApiProvider 的构造函数，在这里初始化 Dio
   ApiProvider() {
@@ -132,8 +161,7 @@ class ApiProvider {
         token: 'another-fake-jwt-token-${DateTime.now().millisecondsSinceEpoch}',
         bio: '热爱 Flutter 开发！',
       );
-    }
-    else {
+    } else {
       // 模拟登录失败
       print('模拟登录失败: $username');
       Get.snackbar(
@@ -147,7 +175,6 @@ class ApiProvider {
     }
     // --- 模拟逻辑结束 ---
   }
-
 
   // --- TODO 相关 API ---
 
@@ -277,7 +304,6 @@ class ApiProvider {
   // Future<UserModel?> getUserProfile() async { /* ... */ return null;}
   // Future<bool> updateUserProfile(UserModel user) async { /* ... */ return false;}
 
-
   // 模拟获取当前登录用户的个人信息
   // 通常这需要一个 token 或用户 ID，但在模拟中我们简化处理
   Future<UserModel?> getUserProfile(String userIdOrToken) async {
@@ -311,19 +337,19 @@ class ApiProvider {
     if (userIdOrToken.contains('user-123') || userIdOrToken.contains('testuser')) {
       print('API 模拟: 获取用户 "testuser" 的个人信息');
       return UserModel(
-          id: 'user-123',
-          username: 'testuser',
-          email: 'testuser@example.com',
-          bio: '这是通过 API 获取的测试用户简介。',
-          // token 不需要在这里返回，因为通常 token 是登录时获取的，用于后续请求认证
+        id: 'user-123',
+        username: 'testuser',
+        email: 'testuser@example.com',
+        bio: '这是通过 API 获取的测试用户简介。',
+        // token 不需要在这里返回，因为通常 token 是登录时获取的，用于后续请求认证
       );
     } else if (userIdOrToken.contains('user-789') || userIdOrToken.contains('jules')) {
-       print('API 模拟: 获取用户 "jules" 的个人信息');
-       return UserModel(
-          id: 'user-789',
-          username: 'jules',
-          email: 'jules@example.dev',
-          bio: 'Flutter 开发者，热爱开源。',
+      print('API 模拟: 获取用户 "jules" 的个人信息');
+      return UserModel(
+        id: 'user-789',
+        username: 'jules',
+        email: 'jules@example.dev',
+        bio: 'Flutter 开发者，热爱开源。',
       );
     }
 
@@ -331,12 +357,12 @@ class ApiProvider {
     // Get.snackbar('错误', '未能获取用户信息 (模拟)', snackPosition: SnackPosition.BOTTOM);
     // return null;
     // 为了让 ProfileController 能获取到数据，我们默认返回 testuser
-     print('API 模拟: userIdOrToken "$userIdOrToken" 未直接匹配，默认返回 testuser 的信息');
+    print('API 模拟: userIdOrToken "$userIdOrToken" 未直接匹配，默认返回 testuser 的信息');
     return UserModel(
-        id: 'user-123',
-        username: 'testuser',
-        email: 'testuser@example.com',
-        bio: '这是默认的测试用户简介。',
+      id: 'user-123',
+      username: 'testuser',
+      email: 'testuser@example.com',
+      bio: '这是默认的测试用户简介。',
     );
     // --- 模拟逻辑结束 ---
   }
@@ -380,8 +406,8 @@ class ApiProvider {
     // 查找是否存在该用户（基于ID），如果存在则更新
     // （这个模拟的API Provider没有一个用户列表来更新，所以我们直接返回）
     if (userToUpdate.id == 'user-123' || userToUpdate.id == 'user-789') {
-        Get.snackbar('成功', '用户信息已在服务器端更新 (模拟)', snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.green, colorText: Colors.white);
-        return userToUpdate; // 直接返回传入的对象，模拟更新成功
+      Get.snackbar('成功', '用户信息已在服务器端更新 (模拟)', snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.green, colorText: Colors.white);
+      return userToUpdate; // 直接返回传入的对象，模拟更新成功
     }
 
     Get.snackbar('错误', '更新用户信息失败，用户未找到 (模拟)', snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.red);
@@ -390,4 +416,12 @@ class ApiProvider {
   }
   // Future<bool> updateUserProfile(UserModel user) async { /* ... */ return false;}
 
+  // --- 播放器相关 API ---
+
+  // 模拟获取播放列表
+  Future<List<SongModel>?> getPlaylist() async {
+    await Future.delayed(const Duration(milliseconds: 400)); // 模拟网络延迟
+    print('API 模拟: 获取了 ${_simulatedPlaylist.length} 条播放列表歌曲。');
+    return List<SongModel>.from(_simulatedPlaylist);
+  }
 }
