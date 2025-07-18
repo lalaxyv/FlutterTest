@@ -3,6 +3,7 @@
 // 它将负责管理播放器的所有状态和业务逻辑，
 // 例如播放/暂停、切换歌曲、管理播放列表、更新进度条等。
 
+import 'package:flutter/animation.dart';
 import 'package:get/get.dart'; // 导入 GetX 包
 import 'package:just_audio/just_audio.dart'; // 导入 just_audio 包
 import '../../data/models/song_model.dart'; // 导入歌曲模型
@@ -11,8 +12,8 @@ import 'dart:math';
 // 定义播放模式的枚举
 enum PlayMode { single, loop, shuffle }
 
-// PlayerController 类继承自 GetxController
-class PlayerController extends GetxController {
+// PlayerController 类继承自 GetxController，并混入 GetSingleTickerProviderStateMixin 以提供 Ticker
+class PlayerController extends GetxController with GetSingleTickerProviderStateMixin {
   // --- 响应式状态变量 ---
 
   // 播放器是否正在播放
@@ -35,17 +36,29 @@ class PlayerController extends GetxController {
   // just_audio 播放器实例
   final _audioPlayer = AudioPlayer();
 
+  // 专辑封面旋转动画的控制器
+  late final AnimationController albumArtAnimationController;
+
   // onInit 是 GetxController 的生命周期方法，在控制器初始化时调用。
   @override
   void onInit() {
     super.onInit(); // 调用父类的 onInit 方法
+
+    // 初始化动画控制器
+    albumArtAnimationController = AnimationController(
+      vsync: this, // 使用 GetSingleTickerProviderStateMixin 提供的 Ticker
+      duration: const Duration(seconds: 20), // 旋转一周的时间
+    );
+
     _loadMockPlaylist(); // 加载模拟播放列表
     _listenToPlayerState(); // 监听播放器状态变化
+    _listenToAnimation(); // 监听播放状态以控制动画
   }
 
   // onClose 是 GetxController 的生命周期方法，在控制器销毁前调用。
   @override
   void onClose() {
+    albumArtAnimationController.dispose(); // 销毁动画控制器
     _audioPlayer.dispose(); // 释放音频播放器资源
     super.onClose(); // 调用父类的 onClose 方法
   }
@@ -60,26 +73,40 @@ class PlayerController extends GetxController {
           title: '夜曲',
           artist: '周杰伦',
           duration: const Duration(minutes: 3, seconds: 45),
-          albumArtUrl: '',
+          albumArtUrl:
+              'https://links.jianshu.com/go?to=https%3A%2F%2Fupload-images.jianshu.io%2Fupload_images%2F5809200-a99419bb94924e6d.jpg%3FimageMogr2%2Fauto-orient%2Fstrip%257CimageView2%2F2%2Fw%2F1240',
           audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3'),
       SongModel(
           id: '2',
           title: '稻香',
           artist: '周杰伦',
           duration: const Duration(minutes: 3, seconds: 21),
-          albumArtUrl: '',
+          albumArtUrl:
+              'https://links.jianshu.com/go?to=https%3A%2F%2Fupload-images.jianshu.io%2Fupload_images%2F5809200-48dd99da471ffa3f.jpg%3FimageMogr2%2Fauto-orient%2Fstrip%257CimageView2%2F2%2Fw%2F1240',
           audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3'),
       SongModel(
           id: '3',
           title: '青花瓷',
           artist: '周杰伦',
           duration: const Duration(minutes: 3, seconds: 58),
-          albumArtUrl: '',
+          albumArtUrl:
+              'https://links.jianshu.com/go?to=https%3A%2F%2Fupload-images.jianshu.io%2Fupload_images%2F5809200-03bbbd715c24750e.jpg%3FimageMogr2%2Fauto-orient%2Fstrip%257CimageView2%2F2%2Fw%2F1240',
           audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3'),
     ]);
     if (playlist.isNotEmpty) {
       selectSong(playlist.first, autoPlay: false); // 默认加载第一首歌，但不自动播放
     }
+  }
+
+  // 监听播放状态以控制封面旋转动画
+  void _listenToAnimation() {
+    isPlaying.listen((playing) {
+      if (playing) {
+        albumArtAnimationController.repeat(); // 如果在播放，则重复动画
+      } else {
+        albumArtAnimationController.stop(); // 如果暂停，则停止动画
+      }
+    });
   }
 
   // 监听播放器状态
@@ -150,6 +177,7 @@ class PlayerController extends GetxController {
   // 从播放列表选择一首歌
   Future<void> selectSong(SongModel song, {bool autoPlay = true}) async {
     currentSong.value = song;
+    albumArtAnimationController.reset(); // 切换歌曲时重置动画
     try {
       // 从 URL 设置音频源
       await _audioPlayer.setUrl(song.audioUrl);

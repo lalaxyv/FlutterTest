@@ -87,7 +87,7 @@ class LoginController extends GetxController {
         Get.snackbar(
           '登录成功',
           '欢迎回来, ${user.username}!',
-          snackPosition: SnackPosition.BOTTOM,
+          snackPosition: SnackPosition.TOP,
           backgroundColor: Colors.green,
           colorText: Colors.white,
         );

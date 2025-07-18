@@ -87,12 +87,12 @@ class HomeView extends GetView<HomeController> {
               ),
               BottomNavigationBarItem(
                 icon: Icon(Icons.person_outline_rounded), // 未选中时的图标
-                label: '我的', // 标签文本
+                label: 'About', // 标签文本
                 activeIcon: Icon(Icons.person_rounded), // 选中时的图标 (可选)
               ),
               BottomNavigationBarItem(
                 icon: Icon(Icons.play_circle), // 未选中时的图标
-                label: '播放器', // 标签文本
+                label: 'Music', // 标签文本
                 activeIcon: Icon(Icons.person_rounded), // 选中时的图标 (可选)
               ),
             ],
