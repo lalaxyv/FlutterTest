@@ -91,35 +91,53 @@ class PlayerView extends GetView<PlayerController> {
 
   // 构建专辑封面
   Widget _buildAlbumArt() {
-    return Container(
-      width: 250,
-      height: 250,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.3),
-            blurRadius: 20,
-            spreadRadius: 5,
-          )
-        ],
-      ),
-      child: ClipOval(
-        child: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Color(0xFFFF6B6B), Color(0xFF4ECDC4)],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-          ),
-          child: Center(
-            child: Text(
-              '♪',
-              style: TextStyle(fontSize: 100, color: Colors.white.withOpacity(0.6)),
-            ),
-          ),
+    return RotationTransition(
+      // turns 属性绑定到动画控制器
+      turns: controller.albumArtAnimationController,
+      child: Container(
+        width: 250,
+        height: 250,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.3),
+              blurRadius: 20,
+              spreadRadius: 5,
+            )
+          ],
         ),
+        child: Obx(() => ClipOval(
+          // 使用 Obx 监听当前歌曲的变化
+          child: Image.network(
+            // 从当前歌曲获取专辑封面 URL
+            controller.currentSong.value?.albumArtUrl ?? '',
+            fit: BoxFit.cover,
+            // 加载时的占位符
+            loadingBuilder: (context, child, loadingProgress) {
+              if (loadingProgress == null) return child;
+              return const Center(child: CircularProgressIndicator(color: Colors.white));
+            },
+            // 加载失败时的占位符
+            errorBuilder: (context, error, stackTrace) {
+              return Container(
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [Color(0xFFFF6B6B), Color(0xFF4ECDC4)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                ),
+                child: Center(
+                  child: Text(
+                    '♪',
+                    style: TextStyle(fontSize: 100, color: Colors.white.withOpacity(0.6)),
+                  ),
+                ),
+              );
+            },
+          ),
+        )),
       ),
     );
   }
