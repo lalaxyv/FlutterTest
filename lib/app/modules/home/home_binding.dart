@@ -8,6 +8,7 @@ import './home_controller.dart'; // 导入主页控制器
 // 导入未来会创建的 TODO 和 Profile 控制器，因为它们将作为 Home 页的一部分
 import '../todo/todo_controller.dart';
 import '../profile/profile_controller.dart';
+import '../player/player_controller.dart';
 
 // HomeBinding 类继承自 Bindings
 class HomeBinding extends Bindings {
@@ -25,6 +26,9 @@ class HomeBinding extends Bindings {
     // 懒加载用户信息控制器，它将在 Home 页面的 Profile 标签页中使用
     Get.lazyPut<ProfileController>(
       () => ProfileController(),
+    );
+    Get.lazyPut<PlayerController>(
+      () => PlayerController(),
     );
     // 注意：如果 Todo 和 Profile 模块有它们自己的 Binding 文件，
     // 并且你希望通过独立路由访问它们，那么这里的 lazyPut 可能需要调整，

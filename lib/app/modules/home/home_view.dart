@@ -11,6 +11,7 @@ import './home_controller.dart'; // 导入主页控制器
 // 注意：这些文件此时可能还未完全实现，我们先进行引用。
 import '../todo/todo_view.dart';
 import '../profile/profile_view.dart';
+import '../player/player_view.dart';
 
 // HomeView 继承自 GetView<HomeController>，方便访问 HomeController
 class HomeView extends GetView<HomeController> {
@@ -21,30 +22,41 @@ class HomeView extends GetView<HomeController> {
     // Scaffold 是 Material Design 布局的基本结构
     return Scaffold(
       // AppBar 通常显示在屏幕顶部
-      appBar: AppBar(
-        // Obx 用于监听 controller.tabIndex 的变化，并根据其值更新 AppBar 的标题
-        title: Obx(() {
-          // 根据当前选中的标签页索引来设置不同的标题
-          switch (controller.tabIndex.value) {
-            case 0:
-              return const Text('TODO 列表'); // 第一个标签页的标题
-            case 1:
-              return const Text('用户信息'); // 第二个标签页的标题
-            default:
-              return const Text('首页'); // 默认标题
-          }
-        }),
-        centerTitle: true, // 标题居中
-        // actions: [ // 可以在 AppBar 右侧添加操作按钮
-        //   IconButton(
-        //     icon: Icon(Icons.logout),
-        //     onPressed: () {
-        //       // TODO: 实现退出登录逻辑
-        //       // Get.offAllNamed(Routes.LOGIN);
-        //     },
-        //   ),
-        // ],
-      ),
+      appBar: PreferredSize(
+          preferredSize: Size.fromHeight(kToolbarHeight),
+          // 动画切换器，用于在显示和隐藏 AppBar 时添加动画效果
+          child: Obx(
+            () => AnimatedSwitcher(
+                duration: const Duration(milliseconds: 500),
+                child: controller.showAppBar
+                    ? AppBar(
+                        // Obx 用于监听 controller.tabIndex 的变化，并根据其值更新 AppBar 的标题
+                        title: Obx(() {
+                          // 根据当前选中的标签页索引来设置不同的标题
+                          switch (controller.tabIndex.value) {
+                            case 0:
+                              return const Text('TODO 列表'); // 第一个标签页的标题
+                            case 1:
+                              return const Text('用户信息'); // 第二个标签页的标题
+                            case 2:
+                              return const Text('音乐播放'); // 第三个标签页的标题
+                            default:
+                              return const Text('首页'); // 默认标题
+                          }
+                        }),
+                        centerTitle: true, // 标题居中
+                        // actions: [ // 可以在 AppBar 右侧添加操作按钮
+                        //   IconButton(
+                        //     icon: Icon(Icons.logout),
+                        //     onPressed: () {
+                        //       // TODO: 实现退出登录逻辑
+                        //       // Get.offAllNamed(Routes.LOGIN);
+                        //     },
+                        //   ),
+                        // ],
+                      )
+                    : SizedBox.shrink()),
+          )),
       // body 部分根据当前选中的标签页动态显示不同的视图
       // 使用 Obx 包裹以响应 controller.tabIndex 的变化
       body: Obx(() {
@@ -58,6 +70,8 @@ class HomeView extends GetView<HomeController> {
             TodoView(), // TODO 列表视图
             // 第二个标签页对应的视图
             ProfileView(), // 用户信息视图
+            // 第三个标签页对应的视图
+            PlayerView(), // 音乐播放视图
           ],
         );
       }),
@@ -74,6 +88,11 @@ class HomeView extends GetView<HomeController> {
               BottomNavigationBarItem(
                 icon: Icon(Icons.person_outline_rounded), // 未选中时的图标
                 label: '我的', // 标签文本
+                activeIcon: Icon(Icons.person_rounded), // 选中时的图标 (可选)
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.play_circle), // 未选中时的图标
+                label: '播放器', // 标签文本
                 activeIcon: Icon(Icons.person_rounded), // 选中时的图标 (可选)
               ),
             ],

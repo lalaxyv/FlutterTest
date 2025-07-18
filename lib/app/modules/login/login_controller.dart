@@ -58,7 +58,7 @@ class LoginController extends GetxController {
       Get.snackbar(
         '输入错误',
         '请输入用户名',
-        snackPosition: SnackPosition.BOTTOM,
+        snackPosition: SnackPosition.TOP,
         backgroundColor: Colors.orangeAccent,
         colorText: Colors.white,
       );
@@ -68,7 +68,7 @@ class LoginController extends GetxController {
       Get.snackbar(
         '输入错误',
         '请输入密码',
-        snackPosition: SnackPosition.BOTTOM,
+        snackPosition: SnackPosition.TOP,
         backgroundColor: Colors.orangeAccent,
         colorText: Colors.white,
       );

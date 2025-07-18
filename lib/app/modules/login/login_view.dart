@@ -48,7 +48,7 @@ class LoginView extends GetView<LoginController> {
               ),
               const SizedBox(height: 16), // 垂直间隔
               Text(
-                '欢迎使用 TODO 应用', // 欢迎文本
+                '欢迎使用', // 欢迎文本
                 textAlign: TextAlign.center, // 文本居中
                 style: TextStyle(
                   fontSize: 22, // 字体大小
@@ -65,7 +65,8 @@ class LoginView extends GetView<LoginController> {
                   labelText: '用户名', // 输入框标签
                   hintText: '请输入您的用户名', // 提示文本
                   prefixIcon: const Icon(Icons.person_outline_rounded), // 前置图标
-                  border: OutlineInputBorder( // 边框样式
+                  border: OutlineInputBorder(
+                    // 边框样式
                     borderRadius: BorderRadius.circular(8.0), // 圆角边框
                   ),
                 ),
@@ -82,7 +83,8 @@ class LoginView extends GetView<LoginController> {
                       labelText: '密码', // 输入框标签
                       hintText: '请输入您的密码', // 提示文本
                       prefixIcon: const Icon(Icons.lock_outline_rounded), // 前置图标
-                      border: OutlineInputBorder( // 边框样式
+                      border: OutlineInputBorder(
+                        // 边框样式
                         borderRadius: BorderRadius.circular(8.0), // 圆角边框
                       ),
                       // 后置图标，用于切换密码可见性
@@ -119,13 +121,15 @@ class LoginView extends GetView<LoginController> {
                     onPressed: controller.isLoading.value ? null : controller.login,
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 16.0), // 按钮内边距
-                      shape: RoundedRectangleBorder( // 按钮形状
+                      shape: RoundedRectangleBorder(
+                        // 按钮形状
                         borderRadius: BorderRadius.circular(8.0), // 圆角
                       ),
                     ),
                     // 根据加载状态显示不同的按钮内容
                     child: controller.isLoading.value
-                        ? const SizedBox( // 如果正在加载，显示一个加载指示器
+                        ? const SizedBox(
+                            // 如果正在加载，显示一个加载指示器
                             height: 20,
                             width: 20,
                             child: CircularProgressIndicator(
@@ -133,7 +137,8 @@ class LoginView extends GetView<LoginController> {
                               valueColor: AlwaysStoppedAnimation<Color>(Colors.white), // 指示器颜色
                             ),
                           )
-                        : const Text( // 如果未加载，显示 "登录" 文本
+                        : const Text(
+                            // 如果未加载，显示 "登录" 文本
                             '登 录',
                             style: TextStyle(fontSize: 16), // 文本样式
                           ),

@@ -9,12 +9,16 @@ import 'package:get/get.dart'; // 导入 GetX 包
 class HomeController extends GetxController {
   // 使用 .obs 创建一个响应式变量来存储底部导航栏的当前选中项索引。
   // 初始值为 0，表示默认选中第一个标签页。
-  var tabIndex = 0.obs;
+  final RxInt tabIndex = 0.obs;
+  final hideAppBarIndexes = {2};
+
+  bool get showAppBar => !hideAppBarIndexes.contains(tabIndex.value);
 
   // 当底部导航栏的标签页被点击时，调用此方法来更新选中的索引。
   // newIndex 参数是新选中的标签页的索引。
   void changeTabIndex(int newIndex) {
     tabIndex.value = newIndex; // 更新响应式变量的值，UI 将自动响应变化
+    print('tabIndex=$newIndex  showAppBar1=$showAppBar');
   }
 
   // onInit 是 GetxController 的生命周期方法，在控制器初始化时调用。

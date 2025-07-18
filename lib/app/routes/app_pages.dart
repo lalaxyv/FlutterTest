@@ -15,6 +15,8 @@ import '../modules/login/login_view.dart';
 import '../modules/login/login_binding.dart';
 import '../modules/home/home_view.dart';
 import '../modules/home/home_binding.dart';
+import '../modules/player/player_view.dart';
+import '../modules/player/player_binding.dart';
 // import '../modules/todo/todo_view.dart'; // 如果 TODO 是独立页面
 // import '../modules/todo/todo_binding.dart'; // 如果 TODO 是独立页面
 // import '../modules/profile/profile_view.dart'; // 如果 Profile 是独立页面
@@ -43,6 +45,11 @@ class AppPages {
       // 如果 TODO 和 Profile 是 Home 的子页面/标签页，
       // 它们的路由和绑定可能在这里通过 HomeView 的子路由或 GetX 的嵌套路由来管理。
       // 暂时我们先假设 Home 是一个容器页面。
+    ),
+    GetPage(
+      name: Routes.PLAYER,
+      page: () => PlayerView(),
+      binding: PlayerBinding(),
     ),
     // 示例：如果 TODO 是一个独立的顶级页面
     // GetPage(

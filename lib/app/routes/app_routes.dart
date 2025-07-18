@@ -12,6 +12,7 @@ abstract class Routes {
   static const HOME = _Paths.HOME; // 主页路由 (可能包含 TODO 和 Profile)
   static const TODO = _Paths.TODO; // TODO 列表页路由 (如果作为独立页面)
   static const PROFILE = _Paths.PROFILE; // 用户信息页路由 (如果作为独立页面)
+  static const PLAYER = _Paths.PLAYER; // 播放器页路由
   // 如果 TODO 和 Profile 是 HOME 的一部分（例如通过 BottomNavigationBar 切换），
   // 那么它们可能不需要顶级的独立路由，而是作为 HOME 的子路由或部分。
   // 为了示例清晰，我们先定义它们为可能的独立路由。
@@ -24,4 +25,5 @@ abstract class _Paths {
   static const HOME = '/home'; // 主页的具体路径
   static const TODO = '/todo'; // TODO 列表页的具体路径
   static const PROFILE = '/profile'; // 用户信息页的具体路径
+  static const PLAYER = '/player'; // 播放器页的具体路径
 }
