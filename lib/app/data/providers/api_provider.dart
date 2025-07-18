@@ -31,9 +31,56 @@ class ApiProvider {
 
   // 用于存储模拟的播放列表数据 (从 PlayerController 移入)
   final List<SongModel> _simulatedPlaylist = [
-      SongModel(id: '1', title: '夜曲', artist: '周杰伦', duration: const Duration(minutes: 3, seconds: 45), albumArtUrl: 'https://picsum.photos/seed/1/400', audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3'),
-      SongModel(id: '2', title: '稻香', artist: '周杰伦', duration: const Duration(minutes: 3, seconds: 21), albumArtUrl: 'https://picsum.photos/seed/2/400', audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3'),
-      SongModel(id: '3', title: '青花瓷', artist: '周杰伦', duration: const Duration(minutes: 3, seconds: 58), albumArtUrl: 'https://picsum.photos/seed/3/400', audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3'),
+      SongModel(
+        id: '1', title: '夜曲', artist: '周杰伦',
+        duration: const Duration(minutes: 3, seconds: 45),
+        albumArtUrl: 'https://picsum.photos/seed/1/400',
+        audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
+        lyrics: """
+[00:15.00]一群嗜血的蚂蚁
+[00:18.50]被腐肉所吸引
+[00:22.00]我面无表情
+[00:25.50]看孤独的风景
+[00:29.00]失去你 爱恨开始分明
+[00:36.00]失去你 还有什么事好关心
+[00:43.00]那鸽子不再象征和平
+[00:46.50]我终于被提醒
+[00:50.00]广场上喂食的是秃鹰
+[00:57.00]我用漂亮的押韵
+[01:00.50]形容被掠夺一空的爱情
+"""
+      ),
+      SongModel(
+        id: '2', title: '稻香', artist: '周杰伦',
+        duration: const Duration(minutes: 3, seconds: 21),
+        albumArtUrl: 'https://picsum.photos/seed/2/400',
+        audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3',
+        lyrics: """
+[00:20.10]对这个世界如果你有太多的抱怨
+[00:24.50]跌倒了就不敢继续往前走
+[00:28.00]为什么人要这么的脆弱 堕落
+[00:35.50]请你打开电视看看
+[00:39.00]多少人为生命在努力勇敢的走下去
+[00:43.00]我们是不是该知足
+[00:46.50]珍惜一切 就算没有拥有
+"""
+      ),
+      SongModel(
+        id: '3', title: '青花瓷', artist: '周杰伦',
+        duration: const Duration(minutes: 3, seconds: 58),
+        albumArtUrl: 'https://picsum.photos/seed/3/400',
+        audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3',
+        lyrics: """
+[00:10.00]素胚勾勒出青花笔锋浓转淡
+[00:17.50]瓶身描绘的牡丹一如你初妆
+[00:25.00]冉冉檀香透过窗心事我了然
+[00:32.50]宣纸上走笔至此搁一半
+[00:40.00]釉色渲染仕女图韵味被私藏
+[00:47.50]而你嫣然的一笑如含苞待放
+[00:55.00]你的美一缕飘散
+[01:00.00]去到我去不了的地方
+"""
+      ),
   ];
 
   // ApiProvider 的构造函数，在这里初始化 Dio
